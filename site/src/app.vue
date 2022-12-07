@@ -20,20 +20,7 @@
     }
   })
 
-  // const gameBoard = ref([[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]])
-  const gameBoard = ref([
-    [0, 7, 1, 0, 4, 0, 0, 6, 2],
-    [0, 0, 2, 0, 0, 7, 5, 0, 3],
-    [0, 0, 5, 6, 2, 8, 7, 0, 0],
-
-    [6, 0, 4, 1, 3, 9, 2, 0, 7],
-    [7, 5, 0, 0, 0, 0, 6, 0, 0],
-    [2, 0, 9, 7, 5, 0, 0, 0, 4],
-
-    [0, 0, 6, 2, 0, 0, 0, 0, 0],
-    [0, 2, 0, 0, 9, 3, 0, 7, 0],
-    [4, 0, 7, 0, 0, 1, 9, 2, 0]
-  ])
+  const gameBoard = ref([[null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null]])
 
   function isValid(grid, row, col, number) {
     if (grid[row].includes(number)) return false
@@ -45,18 +32,15 @@
   }
 
   function solve(grid, row = 0, col = 0) {
-    if (row == 9) {
-      gameBoard.value = grid
-      return true
-    }
+    if (row == 9) return gameBoard.value = grid
     else if (col == 9) return solve(grid, row + 1, 0)
-    else if (grid[row][col] != 0) return solve(grid, row, col + 1)
+    else if (grid[row][col] != 0 && grid[row][col] != null && grid[row][col] != undefined) return solve(grid, row, col + 1)
     else {
       for (let number = 1; number < 10; number++) {
         if (isValid(grid, row, col, number)) {
           grid[row][col] = number
           if (solve(grid, row, col + 1)) return true
-          else grid[row][col] = 0
+          grid[row][col] = 0
         }
       }
       return false
@@ -64,10 +48,7 @@
   }
 
   const solveHandler = (values, actions) => {
-    gameBoard.value = []
-    for (let i = 0; i < 81; i += 9) gameBoard.value.push(Object.values(values).slice(i, i + 9))
-    solve(gameBoard.value)
-    if (gameBoard.value == null) actions.setFieldError("error", "Cannot solve this puzzle");
+    if (!solve(gameBoard.value)) actions.setFieldError("error", "Cannot solve this puzzle")
   }
 
   function gamePiece(value) {
@@ -85,13 +66,13 @@
       <Form @submit="solveHandler">
         <div class="col-12 game">
           <template v-for="row in 9">
-            <Field v-for="col in 9" :name="row + 'x' + col" :value="gameBoard[row-1][col-1]"
-              v-model="gameBoard[row-1][col-1]" type="number" class="form-control game-input" @change="setBold($event)" />
+            <Field v-for="col in 9" :name="row + 'x' + col" v-model.number="gameBoard[row-1][col-1]" type="number"
+              class="form-control game-input fs-3" @change="setBold($event)" />
           </template>
         </div>
-        <div class="col-12 mt-5 text-end">
+        <div class="col-12 mt-3 text-end">
           <button class="btn btn-lg btn-outline-light px-5 rounded-0" type="submit">SOLVE</button>
-          <ErrorMessage as="div" name="error" v-slot="{ message }">
+          <ErrorMessage class="mt-2" as="div" name="error" v-slot="{ message }">
             <p class="form-message text-danger mt-1">{{
               message
               }}
