@@ -20,17 +20,35 @@
     }
   })
 
-  const gameBoard = ref([[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]])
+  // const gameBoard = ref([[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]])
+  const gameBoard = ref([
+    [0, 7, 1, 0, 4, 0, 0, 6, 2],
+    [0, 0, 2, 0, 0, 7, 5, 0, 3],
+    [0, 0, 5, 6, 2, 8, 7, 0, 0],
+
+    [6, 0, 4, 1, 3, 9, 2, 0, 7],
+    [7, 5, 0, 0, 0, 0, 6, 0, 0],
+    [2, 0, 9, 7, 5, 0, 0, 0, 4],
+
+    [0, 0, 6, 2, 0, 0, 0, 0, 0],
+    [0, 2, 0, 0, 9, 3, 0, 7, 0],
+    [4, 0, 7, 0, 0, 1, 9, 2, 0]
+  ])
 
   function isValid(grid, row, col, number) {
     if (grid[row].includes(number)) return false
     else if (grid.map(c => c[col]).includes(number)) return false
-    for (let i = 0; i < 3; i++) if (grid.slice(Math.floor(row / 3) * 3 + i, Math.floor(row / 3) * 3 + (1 + i)).map((m) => { return m.slice(Math.floor(col / 3) * 3, Math.floor(col / 3) * 3 + 3) })[0].includes(number)) return false
+    for (let i = 0; i < 3; i++) {
+      if (grid.slice(Math.floor(row / 3) * 3 + i, Math.floor(row / 3) * 3 + (1 + i)).map((m) => { return m.slice(Math.floor(col / 3) * 3, Math.floor(col / 3) * 3 + 3) })[0].includes(number)) return false
+    }
     return true
   }
 
   function solve(grid, row = 0, col = 0) {
-    if (row == 9) return gameBoard.value = grid
+    if (row == 9) {
+      gameBoard.value = grid
+      return true
+    }
     else if (col == 9) return solve(grid, row + 1, 0)
     else if (grid[row][col] != 0) return solve(grid, row, col + 1)
     else {
@@ -38,13 +56,12 @@
         if (isValid(grid, row, col, number)) {
           grid[row][col] = number
           if (solve(grid, row, col + 1)) return true
-          grid[row][col] = 0
+          else grid[row][col] = 0
         }
       }
       return false
     }
   }
-
 
   const solveHandler = (values, actions) => {
     gameBoard.value = []
@@ -57,6 +74,10 @@
     if (value && value > 9 || value < 0) return false
     return true;
   }
+
+  function setBold(e) {
+    e.target.classList.add('fw-bold')
+  }
 </script>
 <template>
   <main class="container d-flex align-items-center justify-content-center">
@@ -65,7 +86,7 @@
         <div class="col-12 game">
           <template v-for="row in 9">
             <Field v-for="col in 9" :name="row + 'x' + col" :value="gameBoard[row-1][col-1]"
-              v-model="gameBoard[row-1][col-1]" type="number" class="form-control game-input" />
+              v-model="gameBoard[row-1][col-1]" type="number" class="form-control game-input" @change="setBold($event)" />
           </template>
         </div>
         <div class="col-12 mt-5 text-end">
