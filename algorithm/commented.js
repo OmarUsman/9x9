@@ -49,7 +49,7 @@ function solve(grid, row = 0, col = 0) {
                 grid[row][col] = number
                 // Move on to next number
                 if (solve(grid, row, col + 1)) return true
-                // If execution stack comes here, a deadend was reached so undo number change and try next solution
+                // If execution stack comes here, a dead end was reached so undo number change and try next solution
                 grid[row][col] = 0
             }
         }
